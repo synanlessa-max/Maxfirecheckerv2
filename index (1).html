@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maxfire Checker — Сканирование ПК на читы</title>
+  <style>
+    :root {
+      --bg-color: #0b0507;
+      --card-bg: #14090c;
+      --card-border: #291016;
+      --accent-red: #e61937;
+      --accent-red-hover: #ff2a4b;
+      --accent-glow: rgba(230, 25, 55, 0.25);
+      --text-main: #ffffff;
+      --text-muted: #8e8084;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* Навигация / Хедер */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #e61937, #7a0c1c);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .logo-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: #ffffff;
+    }
+
+    .brand-name {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .badge {
+      background-color: #220e13;
+      color: var(--accent-red);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid #3d141d;
+    }
+
+    .btn-header {
+      background-color: #1e0b10;
+      color: var(--text-main);
+      border: 1px solid #36141c;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-header:hover {
+      background-color: #291016;
+      border-color: var(--accent-red);
+    }
+
+    /* Заголовок страницы */
+    .hero-title {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .hero-title h1 {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .hero-title p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .platform-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #1e0a0f;
+      color: #ffffff;
+      border: 1px solid #38121a;
+      width: fit-content;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* Карточка загрузки */
+    .download-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .download-card::before {
+      content: "";
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .os-icon {
+      width: 32px;
+      height: 32px;
+      fill: #ffffff;
+    }
+
+    .card-titles h3 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .card-titles span {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .file-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--accent-red);
+      color: #ffffff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      width: fit-content;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+
+    .btn-download:hover {
+      background: var(--accent-red-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255, 42, 75, 0.4);
+    }
+
+    .btn-download svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* Статистика */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .stat-highlight {
+      color: #ff3352;
+      background: #2b0e14;
+      padding: 2px 6px;
+      border-radius: 4px;
+      width: fit-content;
+    }
+
+    /* Блок превью */
+    .preview-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      position: relative;
+    }
+
+    .preview-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .preview-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid #3d141d;
+      border-top: 2px solid var(--accent-red);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Хедер -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 6h2v2h-2V7zm0 4h2v6h-2v-6z"/></svg>
+        </div>
+        <span class="brand-name">Maxfire</span>
+        <span class="badge">v2.1.0</span>
+      </div>
+
+      <a href="https://github.com/synanlessa-max/maxfirecheckermain/raw/refs/heads/main/Maxfire%20Checker.exe">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/></svg>
+        Программа
+      </a>
+    </header>
+
+    <!-- Основной заголовок -->
+    <section class="hero-title">
+      <h1>Maxfire Checker сканирует ПК на читы для CS2</h1>
+      <p>Один запуск. Windows.</p>
+      <div style="margin-top: 8px;">
+        <span class="platform-pill">
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4h-13.051M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-13.051-1.802"/></svg>
+          Windows
+        </span>
+      </div>
+    </section>
+
+    <!-- Карточка загрузки -->
+    <section class="download-card">
+      <div class="card-header">
+        <svg class="os-icon" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4h-13.051M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-13.051-1.802"/></svg>
+        <div class="card-titles">
+          <h3>Windows 10/11</h3>
+          <span>Установщик для Windows</span>
+        </div>
+      </div>
+
+      <div class="file-meta">
+        <div>Файл: maxfire_checker.exe</div>
+        <div>Размер файла: 304 КБ</div>
+        <div>Дата обновления: 05.07.2026</div>
+      </div>
+
+      <!-- Кнопка скачивания с GitHub -->
+      <a 
+        href="https://github.com/synanlessa-max/maxfirecheckermain/raw/refs/heads/main/Maxfire%20Checker.exe" 
+        class="btn-download" 
+        download
+      >
+        <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        Скачать .exe
+      </a>
+    </section>
+
+    <!-- Панель статистики -->
+    <section class="stats-row">
+      <div class="stat-item">
+        <span class="stat-label">Версия:</span>
+        <span class="stat-value">v2.1.0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Дата обновления:</span>
+        <span class="stat-value"><span class="stat-highlight">05.07.2026</span></span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Скачано раз:</span>
+        <span class="stat-value">2336</span>
+      </div>
+    </section>
+
+    <!-- Превью / Состояние программы -->
+    <section class="preview-card">
+      <div class="preview-brand">
+        <div class="logo-icon" style="width: 52px; height: 52px; border-radius: 14px;">
+          <svg viewBox="0 0 24 24" style="width: 28px; height: 28px;"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 6h2v2h-2V7zm0 4h2v6h-2v-6z"/></svg>
+        </div>
+        <div class="preview-title">MAXFIRE CHECKER</div>
+      </div>
+
+      <div class="status-indicator">
+        <div class="spinner"></div>
+        <span>Подготовка</span>
+      </div>
+    </section>
+  </div>
+
+</body>
+</html>
